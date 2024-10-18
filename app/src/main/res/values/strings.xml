@@ -1,0 +1,89 @@
+<resources>
+    <string name="app_name">MyRuns</string>
+
+    <string name="profile_photo_title">Profile Photo:</string>
+    <string name="name_title">Name</string>
+    <string name="email_title">Email</string>
+    <string name="phone_title">Phone</string>
+    <string name="class_year_title">Class</string>
+    <string name="gender_title">Gender</string>
+    <string name="major_title">Major</string>
+
+    <string name="name_hint">Your name</string>
+    <string name="email_hint">Your email</string>
+    <string name="phone_hint">Your phone number</string>
+    <string name="class_year_hint">e.g. 2026</string>
+    <string name="major_hint">Your major</string>
+
+    <string name="male_gender_text">Male</string>
+    <string name="female_gender_text">Female</string>
+    <string name="other_gender_text">Other</string>
+
+    <string name="change_button_text">Change</string>
+    <string name="save_button_text">Save</string>
+    <string name="cancel_button_text">Cancel</string>
+    <string name="profile_photo_content_desc">User\'s Uploaded Profile Photo</string>
+
+    <!-- Input Type Options -->
+    <string-array name="input_type_options">
+        <item>Manual Entry</item>
+        <item>GPS</item>
+        <item>Automatic</item>
+    </string-array>
+
+    <!-- Activity Type Options -->
+    <string-array name="activity_type_options">
+        <item>Running</item>
+        <item>Walking</item>
+        <item>Standing</item>
+        <item>Cycling</item>
+        <item>Hiking</item>
+        <item>Downhill Skiing</item>
+        <item>Cross-Country Skiing</item>
+        <item>Snowboarding</item>
+        <item>Skating</item>
+        <item>Swimming</item>
+        <item>Mountain Biking</item>
+        <item>Wheelchair</item>
+        <item>Elliptical</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Manual Entry Titles -->
+    <string name="me_date_title">Date</string>
+    <string name="me_time_title">Time</string>
+    <string name="me_duration_title">Duration</string>
+    <string name="me_distance_title">Distance</string>
+    <string name="me_calories_title">Calories</string>
+    <string name="me_heart_rate_title">Heart Rate</string>
+    <string name="me_comment_title">Comment</string>
+
+    <!-- Map Display Title -->
+    <string name="md_map_title">Map</string>
+
+    <!-- Fragment History Strings -->
+    <string name="fh_nothing_here">Nothing to see here yet</string>
+
+
+    <!-- Fragment Settings Strings -->
+    <string name="fs_account_pref_title">Account Preferences</string>
+    <string name="fs_name_email_class_label">Name, Email, Class, etc</string>
+    <string name="fs_user_profile_detail">User Profile</string>
+    <string name="fs_privacy_setting_label">Privacy Setting</string>
+    <string name="fs_posting_records_anonymously">Posting your records anonymously</string>
+    <string name="fs_additional_settings_label">Additional Settings</string>
+    <string name="fs_unit_pref_label">Unit Preference</string>
+    <string name="fs_select_units_text">Select the units</string>
+    <string name="fs_comments_label">Comments</string>
+    <string name="fs_enter_comments_text">Please enter your comments</string>
+    <string name="fs_misc_label">Misc.</string>
+    <string name="fs_webpage_label">Webpage</string>
+    <string name="fs_webpage_url">https://www.sfu.ca/computing.html</string>
+
+    <!-- Fragment Start Strings -->
+    <string name="fst_input_type_label">Input Type</string>
+    <string name="fst_activity_type_label">Activity Type</string>
+    <string name="fst_start_button_text">Start</string>
+    <string name="fst_sync_button_text">Sync</string>
+
+</resources>
