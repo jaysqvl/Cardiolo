@@ -29,14 +29,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setTitle("MyRuns2")
+        setTitle("MyRuns3")
 
         // Set up the Toolbar as the ActionBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // Set the title for the ActionBar
-        supportActionBar?.title = "MyRuns2"
+        supportActionBar?.title = "MyRuns3"
 
         // Initialize view components
         viewPager2 = findViewById(R.id.viewPager)

@@ -4,20 +4,24 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import android.widget.TextView
-import com.example.myruns.model.ExerciseEntry
 import com.example.myruns.R
+import com.example.myruns.model.ExerciseEntry
+import com.example.myruns.utils.ConverterUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class ExerciseEntryAdapter(private val context: Context) : ListAdapter<ExerciseEntry, ExerciseEntryAdapter.EntryViewHolder>(EntryDiffCallback()) {
+class ExerciseEntryAdapter(
+    private val context: Context,
+    private val onItemClick: (ExerciseEntry) -> Unit
+) : ListAdapter<ExerciseEntry, ExerciseEntryAdapter.EntryViewHolder>(EntryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_exercise_entry, parent, false)
-        return EntryViewHolder(view, context)
+        return EntryViewHolder(view, context, onItemClick)
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
@@ -25,7 +29,12 @@ class ExerciseEntryAdapter(private val context: Context) : ListAdapter<ExerciseE
         holder.bind(entry)
     }
 
-    class EntryViewHolder(itemView: View, private val context: Context) : RecyclerView.ViewHolder(itemView) {
+    class EntryViewHolder(
+        itemView: View,
+        private val context: Context,
+        private val onItemClick: (ExerciseEntry) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
+
         private val entrySummaryTextView: TextView = itemView.findViewById(R.id.ad_entry_summary_tv)
         private val distanceDurationTextView: TextView = itemView.findViewById(R.id.ad_distance_duration_tv)
 
@@ -34,25 +43,47 @@ class ExerciseEntryAdapter(private val context: Context) : ListAdapter<ExerciseE
             val dateFormat = SimpleDateFormat("HH:mm:ss MMM d yyyy", Locale.getDefault())
             val formattedDate = dateFormat.format(entry.dateTime)
 
-            // Dynamically format entry summary with entry type, activity type, date, and time
-            val entrySummary = "${entry.inputType}: ${entry.activityType}, $formattedDate"
+            // Convert inputType and activityType indices to strings
+            val inputTypeString = ConverterUtils.getInputTypeString(entry.inputType, context)
+            val activityTypeString = ConverterUtils.getActivityTypeString(entry.activityType, context)
+
+            // Format entry summary with input type, activity type, date, and time
+            val entrySummary = "$inputTypeString: $activityTypeString, $formattedDate"
             entrySummaryTextView.text = entrySummary
 
-            // Retrieve the unit preference from SharedPreferences
+            // Get unit preference from SharedPreferences so we can convert distance
             val sharedPrefs = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-            val unitPreference = sharedPrefs.getString("unit_preference", "Metric")
+            val unitPreference = sharedPrefs.getString("unit_preference", "Metric") ?: "Metric"
 
-            // Format distance based on unit preference
-            val distance = if (unitPreference == "Metric") {
-                "${entry.distance} Kilometers"
+            // Convert and format distance
+            val convertedDistance = ConverterUtils.convertDistance(entry.distance, unitPreference)
+            val distanceUnit = if (unitPreference == "Metric") {
+                context.getString(R.string.unit_kilometers)
             } else {
-                "${entry.distance} Miles"
+                context.getString(R.string.unit_miles)
             }
+            val distanceString = String.format(
+                Locale.getDefault(),
+                "%.2f %s",
+                convertedDistance,
+                distanceUnit
+            )
 
-            // Dynamically format duration
-            val duration = "${entry.duration} mins ${entry.duration} secs"
-            val distanceDuration = "$distance, $duration"
+            // Format duration
+            val durationString = ConverterUtils.formatDuration(entry.duration)
+
+            // Combine distance and duration
+            val distanceDuration = context.getString(
+                R.string.distance_duration_format,
+                distanceString,
+                durationString
+            )
             distanceDurationTextView.text = distanceDuration
+
+            // Set up click listener for each item
+            itemView.setOnClickListener {
+                onItemClick(entry)
+            }
         }
     }
 

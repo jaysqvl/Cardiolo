@@ -8,7 +8,7 @@ import com.example.myruns.model.ExerciseEntry
 
 @Database(entities = [ExerciseEntry::class], version = 1, exportSchema = false)
 abstract class ExerciseDatabase : RoomDatabase() {
-    abstract val exerciseEntryDao: ExerciseEntryDao // Notice no '()' here
+    abstract val exerciseEntryDao: ExerciseEntryDao // No () because we access as a property
 
     companion object {
         @Volatile

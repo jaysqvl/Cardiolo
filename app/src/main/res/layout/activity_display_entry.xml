@@ -9,70 +9,191 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Exercise Details Header -->
         <TextView
             android:id="@+id/ad_exercise_details_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ad_exercise_details_text"
             android:textAppearance="?attr/textAppearanceHeadline5"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:textSize="22sp" />
 
-        <!-- Display various exercise entry details -->
+        <!-- Input Type Label and Value -->
         <TextView
-            android:id="@+id/ad_input_type_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_input_type_text"
-            android:layout_marginTop="8dp" />
+            android:text="@string/ad_input_type_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/ad_input_type_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Activity Type Label and Value -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ad_activity_type_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ad_activity_type_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Date and Time Label and Value -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_activity_type_text"
-            android:layout_marginTop="8dp" />
+            android:text="@string/ad_date_time_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ad_date_time_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Duration Label and Value -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_date_time_text"
-            android:layout_marginTop="8dp" />
+            android:text="@string/ad_duration_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ad_duration_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Distance Label and Value -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_duration_text"
-            android:layout_marginTop="8dp" />
+            android:text="@string/ad_distance_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ad_distance_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Calories Label and Value -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_distance_text"
-            android:layout_marginTop="8dp" />
+            android:text="@string/ad_calories_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ad_calories_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Heart Rate Label and Value -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_calories_text"
-            android:layout_marginTop="8dp" />
+            android:text="@string/ad_heart_rate_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ad_heart_rate_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Comment Label and Value -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_heart_rate_text"
-            android:layout_marginTop="8dp" />
+            android:text="@string/ad_comment_label"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/ad_comment_tv"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ad_comment_text"
-            android:layout_marginTop="8dp" />
+            android:layout_marginBottom="16dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
 
         <!-- Delete Button -->
         <Button
@@ -80,6 +201,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/ad_delete_button_text" />
+            android:text="@string/ad_delete_button_text"
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
     </LinearLayout>
 </ScrollView>

@@ -1,21 +1,23 @@
 package com.example.myruns.ui.fragments
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.myruns.ui.activities.ProfileActivity
 import com.example.myruns.R
 
 class SettingsFragment : Fragment() {
+
+    private lateinit var privacySettingCheckBox: CheckBox
+    private lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +29,9 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize SharedPreferences
+        sharedPrefs = requireContext().getSharedPreferences("app_preferences", android.content.Context.MODE_PRIVATE)
+
         // Account Preferences click listener
         val accountPreferencesLayout = view.findViewById<LinearLayout>(R.id.name_email_class_layout)
         accountPreferencesLayout.setOnClickListener {
@@ -34,24 +39,30 @@ class SettingsFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Privacy Setting click listener
-        val privacySettingLayout = view.findViewById<LinearLayout>(R.id.privacy_setting_layout)
-        privacySettingLayout.setOnClickListener {
-            // Save the current privacy setting to SharedPreferences
+        // Privacy Setting Switch
+        privacySettingCheckBox = view.findViewById(R.id.privacy_setting_checkbox)
+        // Load and set the initial state of the switch
+        val isPrivate = sharedPrefs.getBoolean("privacy_setting", true)
+        privacySettingCheckBox.isChecked = isPrivate
+
+        // Set listener for Switch changes
+        privacySettingCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            // Save the new privacy setting to SharedPreferences
+            sharedPrefs.edit().putBoolean("privacy_setting", isChecked).apply()
+            val status = if (isChecked) "Private" else "Public"
+            Toast.makeText(requireContext(), "Privacy set to $status", Toast.LENGTH_SHORT).show()
         }
 
         // Unit Preference click listener
         val unitPreferenceLayout = view.findViewById<LinearLayout>(R.id.unit_preference_layout)
         unitPreferenceLayout.setOnClickListener {
             showUnitPreferenceDialog()
-            // Save the selected unit preference to app SharedPreferences
         }
 
         // Comments click listener
         val commentsLayout = view.findViewById<LinearLayout>(R.id.comments_layout)
         commentsLayout.setOnClickListener {
             showCommentsDialog()
-            // Save the entered comment to app SharedPreferences to later upload it to dev?
         }
 
         // Webpage click listener
@@ -60,16 +71,23 @@ class SettingsFragment : Fragment() {
             val webpageUrl = "https://www.sfu.ca/computing.html"
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(webpageUrl)
-            startActivity(intent) // Opens the browser with the provided URL
+            startActivity(intent)
         }
     }
 
-    // Dynamic function to show the Unit Preference dialog
+    // Function to show the Unit Preference dialog
     private fun showUnitPreferenceDialog() {
         val options = arrayOf("Metric (Kilometers)", "Imperial (Miles)")
+        val currentPreference = sharedPrefs.getString("unit_preference", "Metric")
+        val currentSelection = when (currentPreference) {
+            "Metric" -> 0
+            "Imperial" -> 1
+            else -> 0
+        }
+
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Unit Preference")
-            .setSingleChoiceItems(options, -1) { dialog, which ->
+            .setSingleChoiceItems(options, currentSelection) { dialog, which ->
                 val preference = when (which) {
                     0 -> "Metric"
                     1 -> "Imperial"
@@ -77,7 +95,6 @@ class SettingsFragment : Fragment() {
                 }
 
                 // Save to SharedPreferences
-                val sharedPrefs = requireContext().getSharedPreferences("app_preferences", android.content.Context.MODE_PRIVATE)
                 sharedPrefs.edit().putString("unit_preference", preference).apply()
 
                 Toast.makeText(context, "$preference selected", Toast.LENGTH_SHORT).show()
@@ -90,6 +107,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showCommentsDialog() {
+        val savedComment = sharedPrefs.getString("comment", "")
+
         // Create a container (LinearLayout) to hold the EditText
         val container = LinearLayout(requireContext())
         container.orientation = LinearLayout.VERTICAL
@@ -100,6 +119,7 @@ class SettingsFragment : Fragment() {
             hint = "Enter your comment"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
             minHeight = 48 // Optional: setting a minimum height
+            setText(savedComment)
         }
 
         // Add the EditText to the container
@@ -111,8 +131,11 @@ class SettingsFragment : Fragment() {
             .setView(container) // Set the container as the content of the dialog
             .setPositiveButton("OK") { dialog, _ ->
                 val comment = editText.text.toString()
+                // Save the comment to SharedPreferences
+                sharedPrefs.edit().putString("comment", comment).apply()
+
                 if (comment.isNotEmpty()) {
-                    Toast.makeText(requireContext(), "Comment: $comment", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Comment saved", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(requireContext(), "No comment entered", Toast.LENGTH_SHORT).show()
                 }

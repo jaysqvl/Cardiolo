@@ -80,6 +80,13 @@
     <string name="fs_webpage_label">Webpage</string>
     <string name="fs_webpage_url">https://www.sfu.ca/computing.html</string>
 
+    <!-- Unit labels -->
+    <string name="unit_kilometers">Kilometers</string>
+    <string name="unit_miles">Miles</string>
+
+    <!-- Distance and duration format -->
+    <string name="distance_duration_format">%1$s, %2$s</string>
+
     <!-- Fragment Start Strings -->
     <string name="fst_input_type_label">Input Type</string>
     <string name="fst_activity_type_label">Activity Type</string>
@@ -98,6 +105,14 @@
     <string name="ad_delete_button_text">Delete Entry</string>
     <string name="ad_comment_text">Comment</string>
 
+    <string name="ad_input_type_label">Input Type</string>
+    <string name="ad_activity_type_label">Activity Type</string>
+    <string name="ad_date_time_label">Date and Time</string>
+    <string name="ad_duration_label">Duration</string>
+    <string name="ad_distance_label">Distance</string>
+    <string name="ad_calories_label">Calories</string>
+    <string name="ad_heart_rate_label">Heart Rate</string>
+    <string name="ad_comment_label">Comment</string>
 
 
 </resources>

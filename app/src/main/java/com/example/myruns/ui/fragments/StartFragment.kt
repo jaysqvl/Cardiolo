@@ -52,14 +52,19 @@ class StartFragment : Fragment() {
         // Set click listener for the Start button
         startButton.setOnClickListener {
             val selectedInputType = inputTypeSpinner.selectedItem.toString()
+            val selectedActivityTypePosition = activityTypeSpinner.selectedItemPosition
 
             if (selectedInputType == "Manual Entry") {
-                // Launch ManualEntryActivity if the selected input type is "Manual Entry"
+                // Launch ManualEntryActivity
                 val intent = Intent(requireContext(), ManualEntryActivity::class.java)
+                intent.putExtra("activityType", selectedActivityTypePosition)
                 startActivity(intent)
             } else if (selectedInputType == "GPS" || selectedInputType == "Automatic") {
-                // Launch MapDisplayActivity if the selected input type is "GPS" or "Automatic"
+                // Launch MapDisplayActivity
                 val intent = Intent(requireContext(), MapDisplayActivity::class.java)
+                intent.putExtra("activityType", selectedActivityTypePosition)
+                // Pass inputType to MapDisplayActivity so it knows what to do with it
+                intent.putExtra("inputType", selectedInputType)
                 startActivity(intent)
             }
         }
