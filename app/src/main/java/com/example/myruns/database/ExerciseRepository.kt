@@ -1,29 +1,28 @@
 package com.example.myruns.database
 
+import androidx.lifecycle.LiveData
 import com.example.myruns.model.ExerciseEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
-class ExerciseRepository(private val exerciseEntryDao: ExerciseEntryDao) {
+class ExerciseRepository(private val dao: ExerciseEntryDao) {
 
-    val allEntries: Flow<List<ExerciseEntry>> = exerciseEntryDao.getAllEntries()
+    val allEntries: Flow<List<ExerciseEntry>> = dao.getAllEntries()
 
-    suspend fun insert(entry: ExerciseEntry) {
+    suspend fun insertEntry(entry: ExerciseEntry) {
         withContext(Dispatchers.IO) {
-            exerciseEntryDao.insert(entry)
+            dao.insertEntry(entry)
         }
     }
 
     suspend fun deleteEntry(entryId: Long) {
         withContext(Dispatchers.IO) {
-            exerciseEntryDao.deleteEntry(entryId)
+            dao.deleteEntry(entryId)
         }
     }
 
-    suspend fun deleteAllEntries() {
-        withContext(Dispatchers.IO) {
-            exerciseEntryDao.deleteAllEntries()
-        }
+    fun getEntryById(entryId: Long): LiveData<ExerciseEntry> {
+        return dao.getEntryById(entryId)
     }
 }

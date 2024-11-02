@@ -86,4 +86,18 @@
     <string name="fst_start_button_text">Start</string>
     <string name="fst_sync_button_text">Sync</string>
 
+    <!-- Activity DisplayEntry Strings -->
+    <string name="ad_exercise_details_text">Exercise Details</string>
+    <string name="ad_input_type_text">Input Type</string>
+    <string name="ad_activity_type_text">Activity Type</string>
+    <string name="ad_date_time_text">Date and Time</string>
+    <string name="ad_duration_text">Duration</string>
+    <string name="ad_distance_text">Distance</string>
+    <string name="ad_calories_text">Calories</string>
+    <string name="ad_heart_rate_text">Heart Rate</string>
+    <string name="ad_delete_button_text">Delete Entry</string>
+    <string name="ad_comment_text">Comment</string>
+
+
+
 </resources>

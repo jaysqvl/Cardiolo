@@ -9,22 +9,42 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myruns.R
+import com.example.myruns.model.ExerciseEntry
+import com.example.myruns.viewmodel.ExerciseViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.myruns.viewmodel.ExerciseViewModelFactory
+import com.example.myruns.database.ExerciseDatabase
+import com.example.myruns.database.ExerciseRepository
 import java.util.*
 
 class ManualEntryActivity : AppCompatActivity() {
+
+    private val database by lazy { ExerciseDatabase.getInstance(this) }
+    private val repository by lazy { ExerciseRepository(database.exerciseEntryDao) }
+    private val viewModel: ExerciseViewModel by lazy {
+        ViewModelProvider(this, ExerciseViewModelFactory(repository)).get(ExerciseViewModel::class.java)
+    }
+
+    private lateinit var dateTextView: TextView
+    private lateinit var timeTextView: TextView
+    private lateinit var durationTextView: TextView
+    private lateinit var distanceTextView: TextView
+    private lateinit var caloriesTextView: TextView
+    private lateinit var heartRateTextView: TextView
+    private lateinit var commentTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_entry)
 
         // Find the TextViews so we can reference them later
-        val dateTextView: TextView = findViewById(R.id.date_textview)
-        val timeTextView: TextView = findViewById(R.id.time_textview)
-        val durationTextView: TextView = findViewById(R.id.duration_textview)
-        val distanceTextView: TextView = findViewById(R.id.distance_textview)
-        val caloriesTextView: TextView = findViewById(R.id.calories_textview)
-        val heartRateTextView: TextView = findViewById(R.id.heartrate_textview)
-        val commentTextView: TextView = findViewById(R.id.comment_textview)
+        dateTextView = findViewById(R.id.date_textview)
+        timeTextView = findViewById(R.id.time_textview)
+        durationTextView = findViewById(R.id.duration_textview)
+        distanceTextView = findViewById(R.id.distance_textview)
+        caloriesTextView = findViewById(R.id.calories_textview)
+        heartRateTextView = findViewById(R.id.heartrate_textview)
+        commentTextView = findViewById(R.id.comment_textview)
 
         // Show Date Picker OnClick
         dateTextView.setOnClickListener {
@@ -79,7 +99,7 @@ class ManualEntryActivity : AppCompatActivity() {
         saveButton.setOnClickListener {
             // Save to a database (when implemented in further MyRuns)
             Toast.makeText(this, "Entry Saved", Toast.LENGTH_SHORT).show()
-            finish() // Finish activity after saving
+            saveEntry() // Save the entry to the database
         }
 
         // Handle Cancel button
@@ -113,5 +133,28 @@ class ManualEntryActivity : AppCompatActivity() {
 
         // Show the dialog
         builder.show()
+    }
+
+    // Method to save the entry to the database
+    private fun saveEntry() {
+        // Parse the input values and create an ExerciseEntry
+        val entry = ExerciseEntry(
+            inputType = 1,  // Assuming 1 means manual input
+            activityType = 1,  // Replace with actual activity type
+            dateTime = System.currentTimeMillis(),  // Current time for simplicity
+            duration = durationTextView.text.toString().toDoubleOrNull() ?: 0.0,
+            distance = distanceTextView.text.toString().toDoubleOrNull() ?: 0.0,
+            avgPace = 0.0,  // This can be calculated if needed
+            avgSpeed = 0.0,  // This can be calculated if needed
+            calorie = caloriesTextView.text.toString().toDoubleOrNull() ?: 0.0,
+            climb = 0.0,  // Placeholder
+            heartRate = heartRateTextView.text.toString().toDoubleOrNull() ?: 0.0,
+            comment = commentTextView.text.toString()
+        )
+
+        // Insert the entry into the database using the ViewModel
+        viewModel.insert(entry)
+        Toast.makeText(this, "Entry Saved", Toast.LENGTH_SHORT).show()
+        finish() // Close the activity
     }
 }

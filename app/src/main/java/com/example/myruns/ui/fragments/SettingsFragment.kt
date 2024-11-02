@@ -1,6 +1,5 @@
 package com.example.myruns.ui.fragments
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -71,18 +70,22 @@ class SettingsFragment : Fragment() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Unit Preference")
             .setSingleChoiceItems(options, -1) { dialog, which ->
-                when (which) {
-                    0 -> {
-                        Toast.makeText(context, "Metric (Kilometers) selected", Toast.LENGTH_SHORT).show()
-                    }
-                    1 -> {
-                        Toast.makeText(context, "Imperial (Miles) selected", Toast.LENGTH_SHORT).show()
-                    }
+                val preference = when (which) {
+                    0 -> "Metric"
+                    1 -> "Imperial"
+                    else -> "Metric"
                 }
-            }
-            .setNegativeButton("CANCEL", DialogInterface.OnClickListener { dialog, _ ->
+
+                // Save to SharedPreferences
+                val sharedPrefs = requireContext().getSharedPreferences("app_preferences", android.content.Context.MODE_PRIVATE)
+                sharedPrefs.edit().putString("unit_preference", preference).apply()
+
+                Toast.makeText(context, "$preference selected", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
-            })
+            }
+            .setNegativeButton("CANCEL") { dialog, _ ->
+                dialog.dismiss()
+            }
         builder.create().show()
     }
 
