@@ -1,7 +1,6 @@
-package com.example.myruns
+package com.example.myruns.ui.activities
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,6 +16,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import com.example.myruns.R
 import java.io.File
 
 class ProfileActivity : AppCompatActivity() {
@@ -193,7 +193,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun saveProfileImage(bitmap: Bitmap) {
         val filename = "profile_image.png"
         // Save the bitmap to internal storage
-        openFileOutput(filename, Context.MODE_PRIVATE).use { fos ->
+        openFileOutput(filename, MODE_PRIVATE).use { fos ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
         // Save the filename in SharedPreferences

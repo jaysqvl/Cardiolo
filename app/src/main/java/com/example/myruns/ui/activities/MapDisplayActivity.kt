@@ -1,9 +1,10 @@
-package com.example.myruns
+package com.example.myruns.ui.activities
 
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.example.myruns.R
 
 class MapDisplayActivity : AppCompatActivity() {
 

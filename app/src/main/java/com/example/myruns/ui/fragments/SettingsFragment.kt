@@ -1,9 +1,10 @@
-package com.example.myruns
+package com.example.myruns.ui.fragments
 
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,8 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.myruns.ui.activities.ProfileActivity
+import com.example.myruns.R
 
 class SettingsFragment : Fragment() {
 
@@ -92,7 +95,7 @@ class SettingsFragment : Fragment() {
         // Create an EditText programmatically
         val editText = EditText(requireContext()).apply {
             hint = "Enter your comment"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
             minHeight = 48 // Optional: setting a minimum height
         }
 

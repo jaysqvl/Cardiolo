@@ -1,10 +1,15 @@
-package com.example.myruns
+package com.example.myruns.ui.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.example.myruns.ui.fragments.HistoryFragment
+import com.example.myruns.R
+import com.example.myruns.adapter.MyFragmentStateAdapter
+import com.example.myruns.ui.fragments.SettingsFragment
+import com.example.myruns.ui.fragments.StartFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 

@@ -20,7 +20,7 @@
 
         <!-- MainActivity definition -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,11 +29,11 @@
         </activity>
 
         <!-- ProfileActivity definition -->
-        <activity android:name=".ProfileActivity" />
+        <activity android:name=".ui.activities.ProfileActivity" />
 
-        <activity android:name=".ManualEntryActivity"/>
+        <activity android:name=".ui.activities.ManualEntryActivity"/>
 
-        <activity android:name=".MapDisplayActivity"/>
+        <activity android:name=".ui.activities.MapDisplayActivity"/>
 
     </application>
 

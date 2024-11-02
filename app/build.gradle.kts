@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp") version "2.0.21-1.0.26"
+    id("kotlin-kapt")
 }
 
 android {
@@ -31,12 +32,19 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
+
     kotlinOptions {
         jvmTarget = "17"
     }
 }
 
 dependencies {
+    implementation(libs.play.services.maps)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.core.ktx)

@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +9,9 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import com.example.myruns.ui.activities.ManualEntryActivity
+import com.example.myruns.R
+import com.example.myruns.ui.activities.MapDisplayActivity
 
 class StartFragment : Fragment() {
 

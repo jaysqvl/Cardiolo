@@ -1,4 +1,4 @@
-package com.example.myruns
+package com.example.myruns.ui.activities
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myruns.R
 import java.util.*
 
 class ManualEntryActivity : AppCompatActivity() {
