@@ -25,8 +25,9 @@ class DisplayEntryActivity : AppCompatActivity() {
     private val viewModel: ExerciseViewModel by lazy {
         ViewModelProvider(this, ExerciseViewModelFactory(repository)).get(ExerciseViewModel::class.java)
     }
-    private var entryId: Long = -1L  // Use -1L to signify an invalid ID by default
-    private var currentEntry: ExerciseEntry? = null  // Variable to store the entry once observed
+
+    private var entryId: Long = -1L // Default: -1L for invalid ID
+    private var currentEntry: ExerciseEntry? = null  // Stores the entire entry (for deletion or viewing)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +52,7 @@ class DisplayEntryActivity : AppCompatActivity() {
             if (entry == null) {
                 Log.e("DisplayEntryActivity", "No entry found for ID: $entryId")
             } else {
-                currentEntry = entry  // Store the entry so it can be used later for deletion
+                currentEntry = entry
                 displayEntryDetails(entry)
             }
         })
@@ -60,30 +61,34 @@ class DisplayEntryActivity : AppCompatActivity() {
         findViewById<Button>(R.id.ad_delete_button).setOnClickListener {
             currentEntry?.let { entry ->
                 viewModel.delete(entry)  // Deletes based on ID
-                finish()  // Close activity after deletion
+                finish()
             }
         }
     }
 
     private fun displayEntryDetails(entry: ExerciseEntry) {
+        // Convert input type and activity type to strings and display
         val inputTypeString = ConverterUtils.getInputTypeString(entry.inputType, this)
         val activityTypeString = ConverterUtils.getActivityTypeString(entry.activityType, this)
-
         findViewById<TextView>(R.id.ad_input_type_tv).text = inputTypeString
         findViewById<TextView>(R.id.ad_activity_type_tv).text = activityTypeString
 
+        // Convert date and time and display
         val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
         findViewById<TextView>(R.id.ad_date_time_tv).text = dateFormat.format(entry.dateTime)
 
+        // Convert duration based on unit preference and display
         val durationString = ConverterUtils.formatDuration(entry.duration)
         findViewById<TextView>(R.id.ad_duration_tv).text = durationString
 
+        // Convert distance based on unit preference and display
         val sharedPrefs = getSharedPreferences("app_preferences", MODE_PRIVATE)
         val unitPreference = sharedPrefs.getString("unit_preference", "Metric") ?: "Metric"
         val convertedDistance = ConverterUtils.convertDistance(entry.distance, unitPreference)
         val distanceUnit = if (unitPreference == "Metric") getString(R.string.unit_kilometers) else getString(R.string.unit_miles)
         findViewById<TextView>(R.id.ad_distance_tv).text = String.format(Locale.getDefault(), "%.2f %s", convertedDistance, distanceUnit)
 
+        // Format calorie, heart rate, and display
         findViewById<TextView>(R.id.ad_calories_tv).text = String.format(Locale.getDefault(), "%.1f cal", entry.calorie)
         findViewById<TextView>(R.id.ad_heart_rate_tv).text = String.format(Locale.getDefault(), "%.1f bpm", entry.heartRate)
         findViewById<TextView>(R.id.ad_comment_tv).text = entry.comment

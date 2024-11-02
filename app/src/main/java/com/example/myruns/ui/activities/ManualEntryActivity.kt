@@ -85,7 +85,7 @@ class ManualEntryActivity : AppCompatActivity() {
             timePickerDialog.show()
         }
 
-        // Set up onClick listeners for the fields that show dialogs (but won't update the TextViews)
+        // Set up onClick listeners for the fields that show dialog
         findViewById<TextView>(R.id.duration_textview).setOnClickListener {
             showCustomDialog("Duration", "Enter duration",
             InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL) {
@@ -136,6 +136,7 @@ class ManualEntryActivity : AppCompatActivity() {
         }
     }
 
+    // Dialogue helper for all the fields
     private fun showCustomDialog(title: String, hint: String, inputType: Int, onSave: (String) -> Unit) {
         val inputEditText = EditText(this)
         inputEditText.hint = hint
@@ -159,6 +160,7 @@ class ManualEntryActivity : AppCompatActivity() {
         builder.show()
     }
 
+    // Save the entry to the database
     private fun saveEntry() {
         // Set calendar with selected date and time
         val calendar = Calendar.getInstance()

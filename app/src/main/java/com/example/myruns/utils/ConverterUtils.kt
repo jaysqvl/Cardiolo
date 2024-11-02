@@ -3,15 +3,8 @@ package com.example.myruns.utils
 import android.content.Context
 import com.example.myruns.R
 
+// Helper functions to convert between different units and formats
 object ConverterUtils {
-
-    /**
-     * Converts the distance from kilometers to the preferred unit.
-     *
-     * @param distanceInKm The distance in kilometers.
-     * @param unitPreference The user's unit preference ("Metric" or "Imperial").
-     * @return The distance in the preferred unit.
-     */
     fun convertDistance(distanceInKm: Double, unitPreference: String): Double {
         return if (unitPreference == "Metric") {
             distanceInKm
@@ -21,12 +14,6 @@ object ConverterUtils {
         }
     }
 
-    /**
-     * Formats the duration from minutes (Double) to a string in the format "X mins Y secs".
-     *
-     * @param durationInMinutes The duration in minutes as a Double.
-     * @return A formatted duration string.
-     */
     fun formatDuration(durationInMinutes: Double): String {
         val totalSeconds = (durationInMinutes * 60).toInt()
         val minutes = totalSeconds / 60
