@@ -35,6 +35,8 @@
 
         <activity android:name=".ui.activities.MapDisplayActivity"/>
 
+        <activity android:name=".ui.activities.DisplayEntryActivity"/>
+
     </application>
 
 </manifest>

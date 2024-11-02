@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.play.services.maps)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.exifinterface)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.core.ktx)

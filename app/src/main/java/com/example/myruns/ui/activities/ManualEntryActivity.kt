@@ -3,6 +3,7 @@ package com.example.myruns.ui.activities
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.text.InputType
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -75,23 +76,23 @@ class ManualEntryActivity : AppCompatActivity() {
 
         // Dynamically set the dialog for its associated button press
         durationTextView.setOnClickListener {
-            showCustomDialog("Duration", "Enter duration")
+            showCustomDialog("Duration", "Enter duration", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
         }
 
         distanceTextView.setOnClickListener {
-            showCustomDialog("Distance", "Enter distance")
+            showCustomDialog("Distance", "Enter distance", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL)
         }
 
         caloriesTextView.setOnClickListener {
-            showCustomDialog("Calories", "Enter calories")
+            showCustomDialog("Calories", "Enter calories", InputType.TYPE_CLASS_NUMBER)
         }
 
         heartRateTextView.setOnClickListener {
-            showCustomDialog("Heart Rate", "Enter heart rate")
+            showCustomDialog("Heart Rate", "Enter heart rate", InputType.TYPE_CLASS_NUMBER)
         }
 
         commentTextView.setOnClickListener {
-            showCustomDialog("Comment", "Enter your comment")
+            showCustomDialog("Comment", "Enter your comment", InputType.TYPE_CLASS_TEXT)
         }
 
         // Handle Save button
@@ -110,10 +111,11 @@ class ManualEntryActivity : AppCompatActivity() {
     }
 
     // Method to show the custom dialog for various fields (without using XML)
-    private fun showCustomDialog(title: String, hint: String) {
+    private fun showCustomDialog(title: String, hint: String, inputType: Int) {
         // Create an EditText programmatically
         val inputEditText = EditText(this)
         inputEditText.hint = hint
+        inputEditText.inputType = inputType
 
         // Create an AlertDialog
         val builder = AlertDialog.Builder(this)
