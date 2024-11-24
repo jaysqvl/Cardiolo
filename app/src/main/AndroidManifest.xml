@@ -28,7 +28,7 @@
             android:value="AIzaSyC60E2ek2fPyfeswU7g4taJCdm1hv45p24" />
 
         <service
-            android:name=".service.TrackingService"
+            android:name=".services.TrackingService"
             android:foregroundServiceType="location" />
 
         <!-- MainActivity definition -->
