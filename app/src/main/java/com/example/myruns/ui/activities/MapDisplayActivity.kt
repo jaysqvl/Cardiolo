@@ -20,60 +20,69 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mapFragment: SupportMapFragment
     private lateinit var googleMap: GoogleMap
     private lateinit var deleteButton: Button
+
     private var entryId: Long = -1L
     private var currentEntry: ExerciseEntry? = null
+    private var isMapReady = false
 
     private val database by lazy { ExerciseDatabase.getInstance(this) }
     private val repository by lazy { ExerciseRepository(database.exerciseEntryDao) }
     private val viewModel: ExerciseViewModel by lazy {
-        ViewModelProvider(this, ExerciseViewModelFactory(repository)).get(ExerciseViewModel::class.java)
+        ViewModelProvider(
+            this,
+            ExerciseViewModelFactory(repository)
+        ).get(ExerciseViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
 
+        // Initialize the deleteButton
+        deleteButton = findViewById(R.id.delete_button)
         // Initialize the SupportMapFragment
         mapFragment = supportFragmentManager
             .findFragmentById(R.id.map_container_fragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        deleteButton = findViewById(R.id.delete_button)
-
+        // Retrieve the entryId from the intent extras
         entryId = intent.getLongExtra("ENTRY_ID", -1L)
+        Log.d("MapDisplayActivity", "Received entryId: $entryId")
         if (entryId == -1L) {
+            Log.e("MapDisplayActivity", "Invalid entryId, finishing activity")
             finish()
             return
         }
 
+        // Fix the back button behaviour not working in Android Studio
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
         })
 
+        // Observe the ExerciseEntry data
         viewModel.getEntryById(entryId).observe(this, Observer { entry ->
             if (entry != null) {
                 currentEntry = entry
                 displayStats(entry)
-                drawRouteOnMap(entry)
+                if (isMapReady) {
+                    drawRouteOnMap(entry)
+                }
             } else {
                 Log.e("MapDisplayActivity", "No entry found for ID: $entryId")
                 finish()
             }
         })
 
+        // Set the delete button click listener
         deleteButton.setOnClickListener {
             currentEntry?.let { entry ->
                 viewModel.delete(entry)
@@ -90,27 +99,23 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             R.string.map_status_type,
             ConverterUtils.getActivityTypeString(entry.activityType, this)
         )
-
         findViewById<TextView>(R.id.avg_speed_text).text = getString(
             R.string.map_status_avg_speed,
             ConverterUtils.formatSpeed(entry.avgSpeed, unitPreference)
         )
-
         findViewById<TextView>(R.id.cur_speed_text).text = getString(
             R.string.map_status_cur_speed,
             "N/A"
-        ) // Update if there's a dynamic value for "Cur Speed"
+        )
 
         findViewById<TextView>(R.id.calories_text).text = getString(
             R.string.map_status_calories,
             entry.calorie
         )
-
         findViewById<TextView>(R.id.climb_text).text = getString(
             R.string.map_status_climb,
             ConverterUtils.formatClimb(entry.climb, unitPreference)
         )
-
         findViewById<TextView>(R.id.distance_text).text = getString(
             R.string.map_status_distance,
             ConverterUtils.formatDistance(entry.distance, unitPreference)
@@ -124,7 +129,7 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
             val polylineOptions = PolylineOptions()
                 .addAll(locationList)
                 .width(8f)
-                .color(Color.BLUE) // Use theme-safe color
+                .color(Color.BLUE)
             googleMap.addPolyline(polylineOptions)
 
             // Add a green marker for the first location
@@ -180,5 +185,9 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap = map
         googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
         googleMap.isBuildingsEnabled = false
+        isMapReady = true
+        if (currentEntry != null) {
+            drawRouteOnMap(currentEntry!!)
+        }
     }
 }

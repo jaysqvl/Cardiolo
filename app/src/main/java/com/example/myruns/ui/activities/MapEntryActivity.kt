@@ -106,12 +106,12 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_entry)
 
-        // Initialize all setup functions
+        // Initialize all setup functions (The order here matters)
+        initializeUIElements()
+        extractIntentData()
         checkAndRequestPermissions()
         setupMapFragment()
 
-        initializeUIElements()
-        extractIntentData()
         setupButtons()
         retrieveUnitPreference()
     }
