@@ -107,16 +107,18 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_map_entry)
 
         // Initialize all setup functions
+        checkAndRequestPermissions()
+        setupMapFragment()
+
         initializeUIElements()
         extractIntentData()
         setupButtons()
-        setupMapFragment()
         retrieveUnitPreference()
-        checkAndRequestPermissions()
     }
 
     override fun onStart() {
         super.onStart()
+
         // Bind to TrackingService
         Intent(this, TrackingService::class.java).also { intent ->
             bindService(intent, serviceConnection, BIND_AUTO_CREATE)
@@ -312,20 +314,8 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    private fun setupMap() {
-        configureMapSettings()
-        if (hasLocationPermissions()) {
-            fetchLastKnownLocation()
-        } else {
-            Log.e(
-                "MapEntryActivity",
-                "Location permissions not granted. Cannot fetch last known location."
-            )
-        }
-    }
-
     @SuppressLint("MissingPermission")
-    private fun configureMapSettings() {
+    private fun setupMap() {
         googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
         googleMap.uiSettings.isZoomControlsEnabled = true
         googleMap.uiSettings.isMyLocationButtonEnabled = true
@@ -338,6 +328,15 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.e(
                 "MapEntryActivity",
                 "Location permissions not granted. Cannot disable My Location layer."
+            )
+        }
+
+        if (hasLocationPermissions()) {
+            fetchLastKnownLocation()
+        } else {
+            Log.e(
+                "MapEntryActivity",
+                "Location permissions not granted. Cannot fetch last known location."
             )
         }
     }

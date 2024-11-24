@@ -19,7 +19,7 @@ import com.example.myruns.viewmodel.ExerciseViewModelFactory
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -28,7 +28,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 
 class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mapView: MapView
+    private lateinit var mapFragment: SupportMapFragment
     private lateinit var googleMap: GoogleMap
     private lateinit var deleteButton: Button
     private var entryId: Long = -1L
@@ -44,11 +44,12 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_display)
 
-        mapView = findViewById(R.id.map_view)
-        deleteButton = findViewById(R.id.delete_button)
+        // Initialize the SupportMapFragment
+        mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map_container_fragment) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+        deleteButton = findViewById(R.id.delete_button)
 
         entryId = intent.getLongExtra("ENTRY_ID", -1L)
         if (entryId == -1L) {
@@ -179,25 +180,5 @@ class MapDisplayActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap = map
         googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
         googleMap.isBuildingsEnabled = false
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
     }
 }

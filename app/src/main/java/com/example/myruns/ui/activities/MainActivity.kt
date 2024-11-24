@@ -1,9 +1,6 @@
 package com.example.myruns.ui.activities
 
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -13,11 +10,13 @@ import com.example.myruns.adapter.MyFragmentStateAdapter
 import com.example.myruns.ui.fragments.HistoryFragment
 import com.example.myruns.ui.fragments.SettingsFragment
 import com.example.myruns.ui.fragments.StartFragment
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.gms.maps.model.LatLng
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragments: ArrayList<Fragment>
     private val tabTitles = arrayOf("Start", "History", "Settings")
     private lateinit var tabLayoutMediator: TabLayoutMediator
-    private lateinit var preloadMapView: MapView
+    private lateinit var preloadMapFragment: SupportMapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +40,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setTitle("MyRuns5")
 
-        preloadMapView(savedInstanceState)
+        // Preload the SupportMapFragment
+        preloadSupportMapFragment()
 
         // Set up the Toolbar as the ActionBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -80,28 +80,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Suppress("SENSELESS_COMPARISON")
-    private fun preloadMapView(savedInstanceState: Bundle?) {
-        // Initialize the hidden MapView programmatically
-        preloadMapView = MapView(this)
-        preloadMapView.onCreate(savedInstanceState)
+    private fun preloadSupportMapFragment() {
+        // Create a new instance of SupportMapFragment
+        preloadMapFragment = SupportMapFragment.newInstance()
 
-        // Add the MapView to an off-screen container
-        val offscreenLayout = LinearLayout(this)
-        offscreenLayout.visibility = View.GONE
-        offscreenLayout.addView(preloadMapView)
-        val rootView = findViewById<ViewGroup>(android.R.id.content)
-        rootView.addView(offscreenLayout)
+        // Add it to the activity's FragmentManager but keep it hidden
+        supportFragmentManager.beginTransaction()
+            .add(preloadMapFragment, "preloadMapFragment")
+            .hide(preloadMapFragment)
+            .commit()
 
-        // Use a single getMapAsync call
-        preloadMapView.getMapAsync { googleMap ->
-            // Just incase the map isn't ready
+        // Initialize the map asynchronously
+        preloadMapFragment.getMapAsync { googleMap ->
             if (googleMap == null) {
                 // Handle map initialization failure if needed
                 return@getMapAsync
             }
 
-            // Setup the map
+            // Apply the same map settings as in MapEntryActivity and MapDisplayActivity
             configureMapSettings(googleMap)
+
+            // Preload map tiles by moving the camera to Greater Vancouver
+            val greaterVancouver = LatLng(49.2827, -123.1207)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(greaterVancouver, 12f))
         }
     }
 
@@ -118,20 +119,5 @@ class MainActivity : AppCompatActivity() {
         val newHistoryFragment = HistoryFragment()
         fragments[1] = newHistoryFragment // Replace the existing HistoryFragment
         myFragmentStateAdapter.refreshFragment(1, newHistoryFragment) // Notify the adapter
-    }
-
-    override fun onResume() {
-        super.onResume()
-        preloadMapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        preloadMapView.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        preloadMapView.onDestroy()
     }
 }
