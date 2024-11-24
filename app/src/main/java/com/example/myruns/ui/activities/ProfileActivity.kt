@@ -89,7 +89,7 @@ class ProfileActivity : AppCompatActivity() {
         // Set up the Toolbar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar?.title = "MyRuns3"
+        supportActionBar?.title = "MyRuns5"
     }
 
     private fun loadProfile() {

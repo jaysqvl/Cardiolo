@@ -11,10 +11,10 @@
 
         <!-- Exercise Details Header -->
         <TextView
-            android:id="@+id/ad_exercise_details_tv"
+            android:id="@+id/manual_exercise_details_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_exercise_details_text"
+            android:text="@string/manual_exercise_details_header"
             android:textAppearance="?attr/textAppearanceHeadline5"
             android:layout_marginBottom="16dp"
             android:textSize="22sp" />
@@ -23,13 +23,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_input_type_label"
+            android:text="@string/manual_input_type_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_input_type_tv"
+            android:id="@+id/manual_input_type_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -45,13 +45,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_activity_type_label"
+            android:text="@string/manual_activity_type_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_activity_type_tv"
+            android:id="@+id/manual_activity_type_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -67,13 +67,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_date_time_label"
+            android:text="@string/manual_date_time_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_date_time_tv"
+            android:id="@+id/manual_date_time_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -89,13 +89,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_duration_label"
+            android:text="@string/manual_duration_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_duration_tv"
+            android:id="@+id/manual_duration_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -111,13 +111,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_distance_label"
+            android:text="@string/manual_distance_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_distance_tv"
+            android:id="@+id/manual_distance_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -133,13 +133,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_calories_label"
+            android:text="@string/manual_calories_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_calories_tv"
+            android:id="@+id/manual_calories_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -155,13 +155,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_heart_rate_label"
+            android:text="@string/manual_heart_rate_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_heart_rate_tv"
+            android:id="@+id/manual_heart_rate_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -177,13 +177,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ad_comment_label"
+            android:text="@string/manual_comment_label"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/ad_comment_tv"
+            android:id="@+id/manual_comment_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -195,13 +195,21 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray" />
 
+        <FrameLayout
+            android:id="@+id/map_container"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
         <!-- Delete Button -->
         <Button
-            android:id="@+id/ad_delete_button"
+            android:id="@+id/manual_delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/ad_delete_button_text"
+            android:text="@string/manual_delete_button_text"
             android:textSize="18sp"
             android:layout_gravity="center"/>
     </LinearLayout>

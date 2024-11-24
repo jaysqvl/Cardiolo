@@ -16,12 +16,18 @@ import java.util.Locale
 
 class ExerciseEntryAdapter(
     private val context: Context,
+    private var unitPreference: String,
     private val onItemClick: (ExerciseEntry) -> Unit
 ) : ListAdapter<ExerciseEntry, ExerciseEntryAdapter.EntryViewHolder>(EntryDiffCallback()) {
 
+    fun updateUnitPreference(preference: String) {
+        unitPreference = preference
+        notifyDataSetChanged() // Refresh the adapter to reflect the changes
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EntryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_exercise_entry, parent, false)
-        return EntryViewHolder(view, context, onItemClick)
+        return EntryViewHolder(view, context, unitPreference, onItemClick)
     }
 
     override fun onBindViewHolder(holder: EntryViewHolder, position: Int) {
@@ -32,6 +38,7 @@ class ExerciseEntryAdapter(
     class EntryViewHolder(
         itemView: View,
         private val context: Context,
+        private val unitPreference: String,
         private val onItemClick: (ExerciseEntry) -> Unit
     ) : RecyclerView.ViewHolder(itemView) {
 
@@ -51,30 +58,15 @@ class ExerciseEntryAdapter(
             val entrySummary = "$inputTypeString: $activityTypeString, $formattedDate"
             entrySummaryTextView.text = entrySummary
 
-            // Get unit preference from SharedPreferences so we can convert distance
-            val sharedPrefs = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE)
-            val unitPreference = sharedPrefs.getString("unit_preference", "Metric") ?: "Metric"
-
-            // Convert and format distance
-            val convertedDistance = ConverterUtils.convertDistance(entry.distance, unitPreference)
-            val distanceUnit = if (unitPreference == "Metric") {
-                context.getString(R.string.unit_kilometers)
-            } else {
-                context.getString(R.string.unit_miles)
-            }
-            val distanceString = String.format(
-                Locale.getDefault(),
-                "%.2f %s",
-                convertedDistance,
-                distanceUnit
-            )
+            // Format distance using the updated formatDistance method
+            val distanceString = ConverterUtils.formatDistance(entry.distance, unitPreference)
 
             // Format duration
             val durationString = ConverterUtils.formatDuration(entry.duration)
 
             // Combine distance and duration
             val distanceDuration = context.getString(
-                R.string.distance_duration_format,
+                R.string.distance_duration_format, // Ensure this string has two placeholders, e.g., "%1$s, %2$s"
                 distanceString,
                 durationString
             )

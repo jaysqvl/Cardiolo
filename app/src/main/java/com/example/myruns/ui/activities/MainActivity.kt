@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewPager2: ViewPager2
     private lateinit var tabLayout: TabLayout
     private lateinit var fragmentStart: StartFragment
-    private lateinit var fragmentHistory: HistoryFragment
     private lateinit var fragmentSettings: SettingsFragment
     private lateinit var myFragmentStateAdapter: MyFragmentStateAdapter
     private lateinit var fragments: ArrayList<Fragment>
@@ -29,14 +28,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setTitle("MyRuns3")
+        setTitle("MyRuns5")
 
         // Set up the Toolbar as the ActionBar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // Set the title for the ActionBar
-        supportActionBar?.title = "MyRuns3"
+        supportActionBar?.title = "MyRuns5"
 
         // Initialize view components
         viewPager2 = findViewById(R.id.viewPager)
@@ -44,13 +43,13 @@ class MainActivity : AppCompatActivity() {
 
         // Set the fragments and initialize them
         fragmentStart = StartFragment()
-        fragmentHistory = HistoryFragment()
+        val initialHistoryFragment = HistoryFragment()
         fragmentSettings = SettingsFragment()
 
         // Add them to the fragments list so that they can be used in the ViewPager adapter
         fragments = ArrayList<Fragment>()
         fragments.add(fragmentStart)
-        fragments.add(fragmentHistory)
+        fragments.add(initialHistoryFragment)
         fragments.add(fragmentSettings)
 
         // Initialize and set up the ViewPager adapter
@@ -64,5 +63,12 @@ class MainActivity : AppCompatActivity() {
 
         // Attach the TabLayoutMediator to sync TabLayout with ViewPager2
         tabLayoutMediator.attach()
+    }
+
+    // Method to refresh the HistoryFragment
+    fun refreshHistoryFragment() {
+        val newHistoryFragment = HistoryFragment()
+        fragments[1] = newHistoryFragment // Replace the existing HistoryFragment
+        myFragmentStateAdapter.refreshFragment(1, newHistoryFragment) // Notify the adapter
     }
 }

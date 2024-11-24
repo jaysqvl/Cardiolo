@@ -44,6 +44,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.gson)
+    implementation(libs.play.services.location)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.play.services.maps)
     implementation(libs.androidx.room.runtime)

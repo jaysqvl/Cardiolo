@@ -94,23 +94,33 @@
     <string name="fst_sync_button_text">Sync</string>
 
     <!-- Activity DisplayEntry Strings -->
-    <string name="ad_exercise_details_text">Exercise Details</string>
-    <string name="ad_input_type_text">Input Type</string>
-    <string name="ad_activity_type_text">Activity Type</string>
-    <string name="ad_date_time_text">Date and Time</string>
-    <string name="ad_duration_text">Duration</string>
-    <string name="ad_distance_text">Distance</string>
-    <string name="ad_calories_text">Calories</string>
-    <string name="ad_heart_rate_text">Heart Rate</string>
-    <string name="ad_delete_button_text">Delete Entry</string>
-    <string name="ad_comment_text">Comment</string>
+    <string name="manual_exercise_details_header">Exercise Details</string>
+    <string name="manual_input_type_text">Input Type</string>
+    <string name="manual_activity_type_text">Activity Type</string>
+    <string name="manual_date_time_text">Date and Time</string>
+    <string name="manual_duration_text">Duration</string>
+    <string name="manual_distance_text">Distance</string>
+    <string name="manual_calories_text">Calories</string>
+    <string name="manual_heart_rate_text">Heart Rate</string>
+    <string name="manual_delete_button_text">Delete Entry</string>
+    <string name="manual_comment_text">Comment</string>
 
-    <string name="ad_input_type_label">Input Type</string>
-    <string name="ad_activity_type_label">Activity Type</string>
-    <string name="ad_date_time_label">Date and Time</string>
-    <string name="ad_duration_label">Duration</string>
-    <string name="ad_distance_label">Distance</string>
-    <string name="ad_calories_label">Calories</string>
-    <string name="ad_heart_rate_label">Heart Rate</string>
-    <string name="ad_comment_label">Comment</string>
+    <string name="manual_input_type_label">Input Type</string>
+    <string name="manual_activity_type_label">Activity Type</string>
+    <string name="manual_date_time_label">Date and Time</string>
+    <string name="manual_duration_label">Duration</string>
+    <string name="manual_distance_label">Distance</string>
+    <string name="manual_calories_label">Calories</string>
+    <string name="manual_heart_rate_label">Heart Rate</string>
+    <string name="manual_comment_label">Comment</string>
+
+    <!-- Activity Map Related Strings -->
+    <string name="map_status_type">Type: %s</string>
+    <string name="map_status_avg_speed">Avg Speed: %s</string>
+    <string name="map_status_cur_speed">Cur Speed: %s</string>
+    <string name="map_status_calories">Calories: %.1f</string>
+    <string name="map_status_climb">Climb: %s</string>
+    <string name="map_status_distance">Distance: %s</string>
+
+    <string name="map_delete_button_text">Delete Entry</string>
 </resources>

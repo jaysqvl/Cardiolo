@@ -6,6 +6,10 @@
         android:name="android.hardware.camera"
         android:required="false" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -17,6 +21,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyRuns"
         tools:targetApi="31">
+
+        <!-- Google Maps API Key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyC60E2ek2fPyfeswU7g4taJCdm1hv45p24" />
+
+        <service
+            android:name=".service.TrackingService"
+            android:foregroundServiceType="location" />
 
         <!-- MainActivity definition -->
         <activity
@@ -33,9 +46,11 @@
 
         <activity android:name=".ui.activities.ManualEntryActivity"/>
 
+        <activity android:name=".ui.activities.MapEntryActivity"/>
+
         <activity android:name=".ui.activities.MapDisplayActivity"/>
 
-        <activity android:name=".ui.activities.DisplayEntryActivity"/>
+        <activity android:name=".ui.activities.ManualDisplayActivity"/>
 
     </application>
 

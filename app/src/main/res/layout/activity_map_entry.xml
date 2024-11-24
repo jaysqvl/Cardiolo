@@ -1,13 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/map_view"
+    <!-- Google Maps Fragment -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map_container_fragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Status section aligned to the top-right -->
     <LinearLayout
         android:id="@+id/status_layout"
         android:layout_width="wrap_content"
@@ -56,11 +60,29 @@
             android:text="@string/map_status_distance" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/delete_button"
-        android:layout_width="wrap_content"
+    <!-- Save and Cancel buttons at the bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/map_delete_button_text" />
+        android:layout_marginEnd="100dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/save_button_text"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cancel_button_text"
+            tools:ignore="ButtonStyle" />
+    </LinearLayout>
 </RelativeLayout>

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.myruns.ui.activities.ProfileActivity
 import com.example.myruns.R
+import com.example.myruns.ui.activities.MainActivity
 
 class SettingsFragment : Fragment() {
 
@@ -31,6 +32,9 @@ class SettingsFragment : Fragment() {
 
         // Initialize SharedPreferences
         sharedPrefs = requireContext().getSharedPreferences("app_preferences", android.content.Context.MODE_PRIVATE)
+        if (!sharedPrefs.contains("unit_preference")) {
+            sharedPrefs.edit().putString("unit_preference", "Metric").apply()
+        }
 
         // Account Preferences click listener
         val accountPreferencesLayout = view.findViewById<LinearLayout>(R.id.name_email_class_layout)
@@ -78,33 +82,28 @@ class SettingsFragment : Fragment() {
     // Function to show the Unit Preference dialog
     private fun showUnitPreferenceDialog() {
         val options = arrayOf("Metric (Kilometers)", "Imperial (Miles)")
-        val currentPreference = sharedPrefs.getString("unit_preference", "Metric")
-        val currentSelection = when (currentPreference) {
-            "Metric" -> 0
-            "Imperial" -> 1
-            else -> 0
-        }
+        val currentPreference = sharedPrefs.getString("unit_preference", "Metric") ?: "Metric"
+        val currentSelection = if (currentPreference == "Metric") 0 else 1
 
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Unit Preference")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Unit Preference")
             .setSingleChoiceItems(options, currentSelection) { dialog, which ->
-                val preference = when (which) {
-                    0 -> "Metric"
-                    1 -> "Imperial"
-                    else -> "Metric"
-                }
+                val preference = if (which == 0) "Metric" else "Imperial"
 
-                // Save to SharedPreferences
+                // Save the new preference
                 sharedPrefs.edit().putString("unit_preference", preference).apply()
 
-                Toast.makeText(context, "$preference selected", Toast.LENGTH_SHORT).show()
+                // Notify MainActivity or other components
+                (activity as? MainActivity)?.refreshHistoryFragment()
+
+                Toast.makeText(requireContext(), "$preference selected", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             }
-            .setNegativeButton("CANCEL") { dialog, _ ->
-                dialog.dismiss()
-            }
-        builder.create().show()
+            .setNegativeButton("CANCEL") { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
     }
+
 
     private fun showCommentsDialog() {
         val savedComment = sharedPrefs.getString("comment", "")

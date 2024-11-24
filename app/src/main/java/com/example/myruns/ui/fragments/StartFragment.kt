@@ -11,7 +11,7 @@ import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import com.example.myruns.ui.activities.ManualEntryActivity
 import com.example.myruns.R
-import com.example.myruns.ui.activities.MapDisplayActivity
+import com.example.myruns.ui.activities.MapEntryActivity
 
 class StartFragment : Fragment() {
 
@@ -51,17 +51,17 @@ class StartFragment : Fragment() {
 
         // Set click listener for the Start button
         startButton.setOnClickListener {
-            val selectedInputType = inputTypeSpinner.selectedItem.toString()
+            val selectedInputType = inputTypeSpinner.selectedItemPosition
             val selectedActivityTypePosition = activityTypeSpinner.selectedItemPosition
 
-            if (selectedInputType == "Manual Entry") {
+            if (selectedInputType == 0) {
                 // Launch ManualEntryActivity
                 val intent = Intent(requireContext(), ManualEntryActivity::class.java)
                 intent.putExtra("activityType", selectedActivityTypePosition)
                 startActivity(intent)
-            } else if (selectedInputType == "GPS" || selectedInputType == "Automatic") {
+            } else if (selectedInputType == 1 || selectedInputType == 2) {
                 // Launch MapDisplayActivity
-                val intent = Intent(requireContext(), MapDisplayActivity::class.java)
+                val intent = Intent(requireContext(), MapEntryActivity::class.java)
                 intent.putExtra("activityType", selectedActivityTypePosition)
                 // Pass inputType to MapDisplayActivity so it knows what to do with it
                 intent.putExtra("inputType", selectedInputType)
