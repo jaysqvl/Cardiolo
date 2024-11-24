@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setTitle("MyRuns5")
 
-        // Preload the SupportMapFragment
+        // Preload the SupportMapFragment (to be used in MapEntryActivity and MapDisplayActivity)
         preloadSupportMapFragment()
 
         // Set up the Toolbar as the ActionBar
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         // Initialize the map asynchronously
         preloadMapFragment.getMapAsync { googleMap ->
             if (googleMap == null) {
-                // Handle map initialization failure if needed
+                // Handle map initialization failure in case it's null
                 return@getMapAsync
             }
 

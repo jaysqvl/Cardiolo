@@ -169,12 +169,12 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         saveButton.setOnClickListener {
             saveRoute()
             stopTracking()
-            finish() // Finish and save the route
+            finish()
         }
 
         cancelButton.setOnClickListener {
             stopTracking()
-            finish() // Finish without saving
+            finish()
         }
     }
 
@@ -282,7 +282,7 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
                     startTrackingService()
                 }
             } else {
-                // Permission denied, handle accordingly
+                // Permission denied message
                 Toast.makeText(
                     this,
                     "Location and sensor permissions are required for tracking.",
@@ -309,7 +309,7 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         // Initialize polyline here if not already initialized
         polyline = googleMap.addPolyline(
             PolylineOptions()
-                .color(Color.BLUE) // Choose a visible color
+                .color(Color.BLUE)
                 .width(8f)
         )
     }

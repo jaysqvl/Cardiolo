@@ -213,7 +213,7 @@ class TrackingService : Service(), SensorEventListener {
             true // Not required for GPS mode
         }
 
-        // For Android 14+, check FOREGROUND_SERVICE_LOCATION
+        // WARNING: For Android 14+, we need to check FOREGROUND_SERVICE_LOCATION
         val foregroundServiceLocation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
                 this,
@@ -291,16 +291,16 @@ class TrackingService : Service(), SensorEventListener {
                 .setContentText("Location tracking in progress")
                 .setSmallIcon(R.drawable.ic_tracking)
                 .setOngoing(true) // Sticky notification
-                .setCategory(Notification.CATEGORY_SERVICE) // Proper category for foreground services
+                .setCategory(Notification.CATEGORY_SERVICE)
                 .setContentIntent(pendingIntent) // Set the PendingIntent
         } else {
             @Suppress("DEPRECATION")
             Notification.Builder(this)
                 .setContentTitle("Tracking Your Activity")
                 .setContentText("Location tracking in progress")
-                .setSmallIcon(R.drawable.ic_tracking) // Replace with a valid icon
+                .setSmallIcon(R.drawable.ic_tracking)
                 .setOngoing(true) // Sticky notification
-                .setContentIntent(pendingIntent) // Set the PendingIntent
+                .setContentIntent(pendingIntent)
         }
         return notificationBuilder.build()
     }
