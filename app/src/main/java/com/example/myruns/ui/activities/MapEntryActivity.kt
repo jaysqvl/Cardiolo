@@ -18,7 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.example.myruns.R
-import com.example.myruns.service.TrackingService
+import com.example.myruns.services.TrackingService
 import com.example.myruns.utils.ConverterUtils
 import com.example.myruns.viewmodel.MapEntryViewModel
 import com.example.myruns.viewmodel.MapEntryViewModelFactory
@@ -32,17 +32,19 @@ import com.google.android.gms.maps.model.*
 
 class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    // ----------------------- Map-Related Variables -----------------------
+    // Map Variables
     private lateinit var googleMap: GoogleMap
     private var startingLocation: LatLng? = null
     private var currentMarker: Marker? = null
     private var polyline: Polyline? = null
+    private var lastCameraUpdateTime = 0L
+    private val cameraUpdateInterval = 5000L // Update every 5 seconds
 
-    // ----------------------- Permission and Map Readiness Flags -----------------------
+    // Permissions and Readiness Flags
     private var isMapReady = false
     private var permissionsGranted = false
 
-    // ----------------------- UI Elements -----------------------
+    // UI Variables
     private lateinit var saveButton: Button
     private lateinit var cancelButton: Button
     private lateinit var typeTextView: TextView
@@ -52,16 +54,16 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var avgSpeedTextView: TextView
     private lateinit var curSpeedTextView: TextView
 
-    // ----------------------- Unit Preference -----------------------
+    // Current Unit Metric Preference
     private var unitPreference: String = "Metric"
 
-    // ----------------------- Input and Activity Type Codes and Strings -----------------------
+    // Input Type and Activity Type Variables (Intent and AutoGen)
     private var inputTypeCode: Int = -1
     private var activityTypeCode: Int = -1
     private var inputTypeString: String = "Unknown"
     private var activityTypeString: String = "Unknown"
 
-    // ----------------------- ViewModel -----------------------
+    // ViewModel
     private val mapEntryViewModel: MapEntryViewModel by viewModels {
         MapEntryViewModelFactory(
             ExerciseRepository(
@@ -70,7 +72,7 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    // ----------------------- Tracking Service Binding -----------------------
+    // Tracking Service Binding
     private var trackingService: TrackingService? = null
     private var isServiceBound = false
 
@@ -90,12 +92,16 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    // ----------------------- Constants -----------------------
+    // Readability Constants
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+//        private const val INPUT_TYPE_GPS = 1 // Never used, commented  out (for future use)
+        private const val INPUT_TYPE_AUTOMATIC = 2
     }
 
-    // ----------------------- Lifecycle Methods -----------------------
+    // -----------------------------------------------
+    // -------- Activity Lifecycle Code --------------
+    // -----------------------------------------------
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map_entry)
@@ -128,10 +134,11 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Do not stop the tracking here; let it continue in the background
     }
 
-    // ----------------------- UI Initialization Methods -----------------------
+    // ---------------------------------------
+    // -------- Setup Functions --------------
+    // ---------------------------------------
     private fun initializeUIElements() {
         saveButton = findViewById(R.id.save_button)
         cancelButton = findViewById(R.id.cancel_button)
@@ -180,7 +187,10 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         unitPreference = sharedPrefs.getString("unit_preference", "Metric") ?: "Metric"
     }
 
-    // ----------------------- Permission Handling Methods -----------------------
+    // ---------------------------------------
+    // -------- Permissions Functions --------
+    // ---------------------------------------
+
     @SuppressLint("InlinedApi")
     private fun hasLocationPermissions(): Boolean {
         val fineLocation = ContextCompat.checkSelfPermission(
@@ -202,6 +212,7 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun checkAndRequestPermissions() {
         val permissionsNeeded = mutableListOf<String>()
 
+        // Always required
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -220,6 +231,17 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        // Request BODY_SENSORS permission if in Automatic mode
+        if (inputTypeCode == INPUT_TYPE_AUTOMATIC) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BODY_SENSORS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsNeeded.add(Manifest.permission.BODY_SENSORS)
+            }
+        }
+
         if (permissionsNeeded.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
@@ -235,6 +257,7 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -243,10 +266,11 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             var allGranted = true
-            for (result in grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
+            for (i in grantResults.indices) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     allGranted = false
-                    break
+                    val permission = permissions[i]
+                    Log.e("MapEntryActivity", "Permission denied: $permission")
                 }
             }
 
@@ -259,17 +283,18 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Permission denied, handle accordingly
                 Toast.makeText(
                     this,
-                    "Location permissions are required for tracking.",
+                    "Location and sensor permissions are required for tracking.",
                     Toast.LENGTH_LONG
                 ).show()
-                Log.e("MapEntryActivity", "Location permissions denied.")
-                // Optionally, disable tracking features or close the activity
+                Log.e("MapEntryActivity", "Required permissions denied.")
                 finish()
             }
         }
     }
 
-    // ----------------------- Map Ready Callback -----------------------
+    // ---------------------------------------
+    // ---------- Map Functions --------------
+    // ---------------------------------------
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         isMapReady = true
@@ -306,7 +331,7 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap.uiSettings.isMyLocationButtonEnabled = true
         googleMap.isBuildingsEnabled = false
 
-        // Check if permissions are granted before enabling My Location layer
+        // Check we've got permissions before enabling My Location layer
         if (hasLocationPermissions()) {
             googleMap.isMyLocationEnabled = false
         } else {
@@ -354,30 +379,36 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
                 polyline?.points = points
             }
 
-            Log.d("MapEntryActivity", "Polyline updated with new point $location")
+//            Log.d("MapEntryActivity", "Polyline updated with new point $location")
 
-            // Create LatLngBounds to fit both starting location and current location
-            if (startingLocation != null) {
-                val boundsBuilder = LatLngBounds.Builder()
-                boundsBuilder.include(startingLocation!!) // Include starting location
-                boundsBuilder.include(location) // Include current location
-
-                val bounds = boundsBuilder.build()
-
-                // Adjust the camera to fit the bounds with some padding
-                val padding = 100 // Padding in pixels
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
-            } else {
-                // If starting location is not yet set, move camera to current location
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+            // Update the map whenever the user or program hasn't updated it in the last 5 secs
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastCameraUpdateTime > cameraUpdateInterval) {
+                // Create LatLngBounds to fit both starting location and current location
+                if (startingLocation != null) {
+                    val boundsBuilder = LatLngBounds.Builder()
+                    boundsBuilder.include(startingLocation!!)
+                    boundsBuilder.include(location)
+                    val bounds = boundsBuilder.build()
+                    val padding = 100 // Padding in pixels
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+                } else {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+                }
+                lastCameraUpdateTime = currentTime
             }
         }
     }
 
-    // ----------------------- Tracking Service Methods -----------------------
+    // ---------------------------------------
+    // -------- Tracking Functions -----------
+    // ---------------------------------------
     private fun startTrackingService() {
-        // Start the TrackingService
-        val intent = Intent(this, TrackingService::class.java)
+        // Start the TrackingService with input and activity types
+        val intent = Intent(this, TrackingService::class.java).apply {
+            putExtra("inputType", inputTypeCode)
+            putExtra("activityType", activityTypeCode)
+        }
         ContextCompat.startForegroundService(this, intent)
         Log.d("MapEntryActivity", "TrackingService started.")
     }
@@ -432,6 +463,27 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
                     ConverterUtils.formatSpeed(currentSpeed, unitPreference)
                 )
             })
+
+            service.totalClimb.observe(this, Observer { climb ->
+                climbTextView.text = getString(
+                    R.string.map_status_climb,
+                    ConverterUtils.formatClimb(climb, unitPreference)
+                )
+            })
+
+            if (inputTypeCode == INPUT_TYPE_AUTOMATIC) {
+                // Observe currentActivityLabel
+                service.currentActivityLabel.observe(this, Observer { activityLabel ->
+                    activityTypeString = activityLabel
+                    activityTypeCode = service.activityTypeCode
+
+                    // Update the typeTextView with the correct activity type string
+                    typeTextView.text = getString(
+                        R.string.map_status_type,
+                        ConverterUtils.getActivityTypeString(activityTypeCode, this)
+                    )
+                })
+            }
         }
     }
 
@@ -439,20 +491,21 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         // Stop the TrackingService
         val intent = Intent(this, TrackingService::class.java)
         stopService(intent)
-        Log.d("MapEntryActivity", "Tracking service stopped.")
     }
 
-    // ----------------------- Saving -----------------------
+    // ---------------------------------------
+    // ------------ Handle Save --------------
+    // ---------------------------------------
     private fun saveRoute() {
         if (trackingService == null) {
             Toast.makeText(this, "Tracking service not available", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Sync with tracking service (What you see is what you get to save)
         val pathPoints = trackingService?.pathPoints?.value ?: emptyList()
         if (pathPoints.isEmpty()) {
             Toast.makeText(this, "No route to save", Toast.LENGTH_SHORT).show()
-            Log.d("MapEntryActivity", "No path points available to save.")
             return
         }
 
@@ -463,6 +516,12 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         val caloriesBurned = trackingService?.caloriesBurned?.value ?: 0.0
         val avgSpeed = trackingService?.averageSpeed?.value ?: 0.0
         val avgPace = if (totalDistance > 0) durationInMinutes / totalDistance else 0.0
+        val climb = trackingService?.totalClimb?.value ?: 0.0
+
+        // Update activityTypeCode if in Automatic mode
+        if (inputTypeCode == INPUT_TYPE_AUTOMATIC) {
+            activityTypeCode = trackingService?.activityTypeCode ?: activityTypeCode
+        }
 
         mapEntryViewModel.saveExerciseEntry(
             inputTypeCode = inputTypeCode,
@@ -473,9 +532,9 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
             calories = caloriesBurned,
             avgSpeed = avgSpeed,
             avgPace = avgPace,
+            climb = climb,
             pathPoints = pathPoints
         )
-        Log.d("MapEntryActivity", "Route saved to database.")
 
         Toast.makeText(this, "Route saved successfully", Toast.LENGTH_SHORT).show()
     }

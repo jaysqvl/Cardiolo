@@ -20,6 +20,7 @@ class MapEntryViewModel(private val repository: ExerciseRepository) : ViewModel(
         calories: Double,
         avgSpeed: Double,
         avgPace: Double,
+        climb: Double,
         pathPoints: List<LatLng>
     ) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -32,7 +33,7 @@ class MapEntryViewModel(private val repository: ExerciseRepository) : ViewModel(
                 avgPace = avgPace,
                 avgSpeed = avgSpeed,
                 calorie = calories,
-                climb = 0.0,
+                climb = climb,
                 heartRate = 0.0,
                 comment = "",
                 locationList = serializePathPoints(pathPoints)
@@ -40,6 +41,7 @@ class MapEntryViewModel(private val repository: ExerciseRepository) : ViewModel(
             repository.insertEntry(entry)
         }
     }
+
 
     private fun serializePathPoints(pathPoints: List<LatLng>): ByteArray {
         val gson = Gson()
