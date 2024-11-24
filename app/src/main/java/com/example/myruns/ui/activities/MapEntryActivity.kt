@@ -2,11 +2,12 @@ package com.example.myruns.ui.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
@@ -69,6 +70,26 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
+    // ----------------------- Tracking Service Binding -----------------------
+    private var trackingService: TrackingService? = null
+    private var isServiceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as TrackingService.TrackingBinder
+            trackingService = binder.getService()
+            isServiceBound = true
+            observeServiceData()
+            Log.d("MapEntryActivity", "Service connected")
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            trackingService = null
+            isServiceBound = false
+            Log.d("MapEntryActivity", "Service disconnected")
+        }
+    }
+
     // ----------------------- Constants -----------------------
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
@@ -86,19 +107,28 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         setupMapFragment()
         retrieveUnitPreference()
         checkAndRequestPermissions()
-        observeViewModel()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Bind to TrackingService
+        Intent(this, TrackingService::class.java).also { intent ->
+            bindService(intent, serviceConnection, BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Unbind from the service
+        if (isServiceBound) {
+            unbindService(serviceConnection)
+            isServiceBound = false
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopTracking()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (isMapReady && permissionsGranted) {
-            startTrackingAndObserve()
-        }
+        // Do not stop the tracking here; let it continue in the background
     }
 
     // ----------------------- UI Initialization Methods -----------------------
@@ -153,9 +183,15 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
     // ----------------------- Permission Handling Methods -----------------------
     @SuppressLint("InlinedApi")
     private fun hasLocationPermissions(): Boolean {
-        val fineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val fineLocation = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
         val foregroundServiceLocation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.FOREGROUND_SERVICE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
         } else {
             true // Permission not needed below Android 14
         }
@@ -166,12 +202,20 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun checkAndRequestPermissions() {
         val permissionsNeeded = mutableListOf<String>()
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.FOREGROUND_SERVICE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 permissionsNeeded.add(Manifest.permission.FOREGROUND_SERVICE_LOCATION)
             }
         }
@@ -186,7 +230,7 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
             // Permissions already granted
             permissionsGranted = true
             if (isMapReady) {
-                startTrackingAndObserve()
+                startTrackingService()
             }
         }
     }
@@ -209,11 +253,15 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
             if (allGranted) {
                 permissionsGranted = true
                 if (isMapReady) {
-                    startTrackingAndObserve()
+                    startTrackingService()
                 }
             } else {
                 // Permission denied, handle accordingly
-                Toast.makeText(this, "Location permissions are required for tracking.", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    "Location permissions are required for tracking.",
+                    Toast.LENGTH_LONG
+                ).show()
                 Log.e("MapEntryActivity", "Location permissions denied.")
                 // Optionally, disable tracking features or close the activity
                 finish()
@@ -228,10 +276,10 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         setupMap()
 
         if (permissionsGranted) {
-            startTrackingAndObserve()
+            startTrackingService()
         }
 
-        // **Initialize polyline here if not already initialized**
+        // Initialize polyline here if not already initialized
         polyline = googleMap.addPolyline(
             PolylineOptions()
                 .color(Color.BLUE) // Choose a visible color
@@ -244,60 +292,46 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         if (hasLocationPermissions()) {
             fetchLastKnownLocation()
         } else {
-            Log.e("MapEntryActivity", "Location permissions not granted. Cannot fetch last known location.")
+            Log.e(
+                "MapEntryActivity",
+                "Location permissions not granted. Cannot fetch last known location."
+            )
         }
     }
 
-
     @SuppressLint("MissingPermission")
     private fun configureMapSettings() {
-        googleMap.mapType  = GoogleMap.MAP_TYPE_HYBRID
+        googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
         googleMap.uiSettings.isZoomControlsEnabled = true
         googleMap.uiSettings.isMyLocationButtonEnabled = true
         googleMap.isBuildingsEnabled = false
 
         // Check if permissions are granted before enabling My Location layer
         if (hasLocationPermissions()) {
-            // Don't need to worry about permissions here because we're just setting it to false
-            // Throws the error whenever we do anything with location by default
             googleMap.isMyLocationEnabled = false
         } else {
-            Log.e("MapEntryActivity", "Location permissions not granted. Cannot disable My Location layer.")
+            Log.e(
+                "MapEntryActivity",
+                "Location permissions not granted. Cannot disable My Location layer."
+            )
         }
     }
 
-
     @SuppressLint("MissingPermission")
     private fun fetchLastKnownLocation() {
-        val fusedLocationClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this)
+        val fusedLocationClient =
+            com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location?.let {
                 val latLng = LatLng(it.latitude, it.longitude)
                 Log.d("MapEntryActivity", "Last known location: $latLng")
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-                initializeMarkers(latLng)
-
-                // Add the starting point to the ViewModel's pathPoints
-                val speed = it.speed // Speed in m/s (may default to 0.0 for last known location)
-                mapEntryViewModel.addPathPoint(latLng, it.time, speed)
-                Log.d("MapEntryActivity", "Starting point added to ViewModel's pathPoints with speed: $speed")
+                // Do not set startingLocation or add markers here
             } ?: Log.e("MapEntryActivity", "Last location is null")
         }
     }
 
     private fun initializeMarkers(latLng: LatLng) {
-        if (startingLocation == null) {
-            startingLocation = latLng
-            // Add green marker for starting location
-            googleMap.addMarker(
-                MarkerOptions()
-                    .position(latLng)
-                    .title("Start")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-            )
-            Log.d("MapEntryActivity", "Starting location set: $latLng")
-        }
-
         // Initialize current location marker
         if (currentMarker == null) {
             currentMarker = googleMap.addMarker(
@@ -316,7 +350,9 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
             currentMarker?.position = location
 
             // Update the polyline with the latest path points
-            polyline?.points = mapEntryViewModel.pathPoints.value ?: mutableListOf()
+            trackingService?.pathPoints?.value?.let { points ->
+                polyline?.points = points
+            }
 
             Log.d("MapEntryActivity", "Polyline updated with new point $location")
 
@@ -338,104 +374,100 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    // ----------------------- ViewModel Observation -----------------------
-    private fun observeViewModel() {
-        // Observe path points to update the map
-        mapEntryViewModel.pathPoints.observe(this, Observer { points ->
-            if (points.isNotEmpty()) {
-                val lastPoint = points.last()
-                updateMap(lastPoint)
-            }
-        })
-
-        // Observe total distance to update the UI
-        mapEntryViewModel.totalDistance.observe(this, Observer { distance ->
-            distanceTextView.text = getString(
-                R.string.map_status_distance,
-                ConverterUtils.formatDistance(distance, unitPreference)
-            )
-        })
-
-        // Observe calories burned to update the UI
-        mapEntryViewModel.caloriesBurned.observe(this, Observer { calories ->
-            caloriesTextView.text = getString(
-                R.string.map_status_calories,
-                calories // Ensure calories is a Double or Float
-            )
-        })
-
-        // Observe average speed to update the UI
-        mapEntryViewModel.averageSpeed.observe(this, Observer { avgSpeed ->
-            avgSpeedTextView.text = getString(
-                R.string.map_status_avg_speed,
-                ConverterUtils.formatSpeed(avgSpeed, unitPreference)
-            )
-        })
-
-        // Observe current speed to update the UI
-        mapEntryViewModel.currentSpeed.observe(this, Observer { currentSpeed ->
-            curSpeedTextView.text = getString(
-                R.string.map_status_cur_speed,
-                ConverterUtils.formatSpeed(currentSpeed, unitPreference)
-            )
-        })
-
-        // Observe climb to update the UI
-//        mapEntryViewModel.climb.observe(this, Observer { climb ->
-//            climbTextView.text = getString(
-//                R.string.map_status_climb,
-//                ConverterUtils.formatClimb(climb, unitPreference)
-//            )
-//        })
-    }
-
-
-    // ----------------------- Tracking Methods -----------------------
-    @SuppressLint("MissingPermission")
-    private fun startTrackingAndObserve() {
-        // Initialize tracking in ViewModel
-        mapEntryViewModel.startTracking()
-        Log.d("MapEntryActivity", "Tracking started in ViewModel.")
-
+    // ----------------------- Tracking Service Methods -----------------------
+    private fun startTrackingService() {
         // Start the TrackingService
         val intent = Intent(this, TrackingService::class.java)
         ContextCompat.startForegroundService(this, intent)
         Log.d("MapEntryActivity", "TrackingService started.")
-
-        // Observe location updates from TrackingService
-        TrackingService.locationUpdates.observe(this, Observer { location ->
-            location?.let {
-                val currentLatLng = LatLng(it.latitude, it.longitude)
-                val timestamp = it.time
-                val speed = it.speed // Speed in m/s
-
-                Log.d("Tracking_Debug", "Location Update: $currentLatLng at $timestamp with speed ${speed * 3.6} km/h")
-
-                // Add the new path point and use the speed value
-                mapEntryViewModel.addPathPoint(currentLatLng, timestamp, speed)
-            }
-        })
     }
 
+    private fun observeServiceData() {
+        trackingService?.let { service ->
+            service.pathPoints.observe(this, Observer { points ->
+                if (points.isNotEmpty()) {
+                    // Set starting location if it's null
+                    if (startingLocation == null) {
+                        startingLocation = points.first()
+                        // Add green marker for starting location
+                        googleMap.addMarker(
+                            MarkerOptions()
+                                .position(startingLocation!!)
+                                .title("Start")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                        )
+                        Log.d("MapEntryActivity", "Starting location set: $startingLocation")
+                    }
+
+                    val lastPoint = points.last()
+                    initializeMarkers(lastPoint) // Ensure current marker is initialized
+                    updateMap(lastPoint)
+                }
+            })
+
+            service.totalDistance.observe(this, Observer { distance ->
+                distanceTextView.text = getString(
+                    R.string.map_status_distance,
+                    ConverterUtils.formatDistance(distance, unitPreference)
+                )
+            })
+
+            service.caloriesBurned.observe(this, Observer { calories ->
+                caloriesTextView.text = getString(
+                    R.string.map_status_calories,
+                    calories
+                )
+            })
+
+            service.averageSpeed.observe(this, Observer { avgSpeed ->
+                avgSpeedTextView.text = getString(
+                    R.string.map_status_avg_speed,
+                    ConverterUtils.formatSpeed(avgSpeed, unitPreference)
+                )
+            })
+
+            service.currentSpeed.observe(this, Observer { currentSpeed ->
+                curSpeedTextView.text = getString(
+                    R.string.map_status_cur_speed,
+                    ConverterUtils.formatSpeed(currentSpeed, unitPreference)
+                )
+            })
+        }
+    }
+
+    private fun stopTracking() {
+        // Stop the TrackingService
+        val intent = Intent(this, TrackingService::class.java)
+        stopService(intent)
+        Log.d("MapEntryActivity", "Tracking service stopped.")
+    }
+
+    // ----------------------- Saving -----------------------
     private fun saveRoute() {
-        val pathPoints = mapEntryViewModel.pathPoints.value ?: emptyList()
+        if (trackingService == null) {
+            Toast.makeText(this, "Tracking service not available", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val pathPoints = trackingService?.pathPoints?.value ?: emptyList()
         if (pathPoints.isEmpty()) {
             Toast.makeText(this, "No route to save", Toast.LENGTH_SHORT).show()
             Log.d("MapEntryActivity", "No path points available to save.")
             return
         }
 
-        val durationInMillis = System.currentTimeMillis() - mapEntryViewModel.startTime
+        val startTime = trackingService?.startTime ?: System.currentTimeMillis()
+        val durationInMillis = System.currentTimeMillis() - startTime
         val durationInMinutes = durationInMillis / 60000.0
-        val totalDistance = mapEntryViewModel.totalDistance.value ?: 0.0
-        val caloriesBurned = mapEntryViewModel.caloriesBurned.value ?: 0.0
-        val avgSpeed = mapEntryViewModel.averageSpeed.value ?: 0.0
+        val totalDistance = trackingService?.totalDistance?.value ?: 0.0
+        val caloriesBurned = trackingService?.caloriesBurned?.value ?: 0.0
+        val avgSpeed = trackingService?.averageSpeed?.value ?: 0.0
         val avgPace = if (totalDistance > 0) durationInMinutes / totalDistance else 0.0
 
         mapEntryViewModel.saveExerciseEntry(
             inputTypeCode = inputTypeCode,
             activityTypeCode = activityTypeCode,
-            startTime = mapEntryViewModel.startTime,
+            startTime = startTime,
             durationInMinutes = durationInMinutes,
             totalDistance = totalDistance,
             calories = caloriesBurned,
@@ -446,12 +478,5 @@ class MapEntryActivity : AppCompatActivity(), OnMapReadyCallback {
         Log.d("MapEntryActivity", "Route saved to database.")
 
         Toast.makeText(this, "Route saved successfully", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun stopTracking() {
-        // Stop the TrackingService
-        val intent = Intent(this, TrackingService::class.java)
-        stopService(intent)
-        Log.d("MapEntryActivity", "Tracking service stopped.")
     }
 }
