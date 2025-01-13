@@ -1,1 +1,2 @@
-# MyRuns
+# Cardiolo
+## Cardio Activity tracking app
