@@ -1,7 +1,7 @@
-# Cardiolo - Advanced Fitness Tracking App
+# Cardiolo - Android Fitness Tracker
 
 ## Overview
-Cardiolo is a sophisticated Android fitness tracking application that enables users to monitor and record their cardio activities using GPS tracking, manual entry, and automated activity detection. Built with modern Android development practices and a robust architecture, the app provides a comprehensive solution for fitness enthusiasts to track their workouts and analyze their progress.
+Cardiolo records workouts through manual entry, GPS tracking, or on-device activity classification. Routes and exercise history are stored locally with Room. This is an individual MyRuns coursework project; the Android package remains `com.example.myruns`.
 
 ## Features
 
@@ -36,7 +36,6 @@ Cardiolo is a sophisticated Android fitness tracking application that enables us
 - Customizable user profiles
 - Profile photo support
 - Personal information storage
-- Privacy settings
 
 ### 📊 Data Management
 - Local database storage using Room
@@ -70,10 +69,10 @@ Cardiolo is a sophisticated Android fitness tracking application that enables us
 - Image processing
 
 ## Development Highlights
-- Implementation of FFT (Fast Fourier Transform) for activity recognition
+- Activity recognition using FFT features and a Weka classifier
 - Custom UI components and layouts
-- Efficient background service management
-- Comprehensive error handling
+- Foreground tracking service with location updates and sensor cleanup
+- Accelerometer fallback with gravity compensation
 - Unit conversion utilities
 
 ## Future Enhancements
@@ -84,7 +83,9 @@ Cardiolo is a sophisticated Android fitness tracking application that enables us
 - Achievement system
 
 ## Technical Requirements
-- Android SDK 28+
+- JDK 17 and Android SDK 35 to build
+- Gradle 8.10.2 through the included wrapper
+- Android 9 (API 28) or later to run
 - Google Play Services
 - Location permissions
 - Camera permissions (optional)
@@ -97,5 +98,15 @@ Cardiolo is a sophisticated Android fitness tracking application that enables us
 4. Add your Google Maps API key in the manifest
 5. Build and run the application
 
+From the repository root, `./gradlew assembleDebug` builds a debug APK after the SDK and Maps configuration are set up. Use a device with location services and an accelerometer to try automatic tracking.
+
+## Current Limitations
+- Calorie estimates use fixed weight and activity values.
+- Tracking state is held in memory until the workout is saved; recovery after process termination is not implemented.
+- The classifier is included, but its training data and accuracy evaluation are not. The current tests are template smoke tests, not coverage of tracking or recognition.
+
+## Attribution
+[`TrackingService.kt`](app/src/main/java/com/example/myruns/services/TrackingService.kt) connects location updates, 64-sample acceleration windows, FFT features, a Weka decision tree, and label smoothing. [`FFT.java`](app/src/main/java/com/example/myruns/services/FFT.java) comes from MEAPsoft/course demo code and retains its Columbia University, Mike Mandel, and GPL v2 notices.
+
 ## License
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+No project-level LICENSE file is currently included. Third-party notices remain in the relevant source files.
